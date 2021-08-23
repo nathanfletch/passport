@@ -30,7 +30,6 @@ Passport.prototype.deleteDestination = function(id) {
   if(!this.destinations[id]) {
     return false;
   }
-
   delete this.destinations[id];
   return true;
 };
@@ -70,9 +69,29 @@ Destination.prototype.tripSummary = function() {
 
 //ui logic
 $(document).ready(function () {
-  $("form").submit(function (event) {
+  const fakeDatabase = new Passport();
+
+  //selectors
+  const form = $("form");
+  const display = $("#display-text");
+
+  //handler callbacks
+  const submitDestination = function (event) {
     event.preventDefault();
-    const text = $("#input1").val();
-    $("#display-text").text(text);
-  });
+    const locationInput = $("#location-input").val();
+    const seasonInput = $("#season-input").val();
+    const noteInput = $("#note-input").val();
+    const landmarksInput = $("#landmarks-input").val().split(", ");
+
+    const newDestination = new Destination(locationInput, seasonInput, noteInput, landmarksInput);
+    display.text(newDestination.tripSummary());
+
+    fakeDatabase.addDestination(newDestination);
+    console.dir(fakeDatabase);
+
+    
+  }
+
+  //actions
+  form.submit(submitDestination);
 });
