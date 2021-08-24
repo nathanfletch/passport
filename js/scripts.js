@@ -19,6 +19,8 @@ Passport.prototype.addDestination = function (destination) {
 };
 
 Passport.prototype.findDestination = function (id) {
+  console.log(this.destinations);
+  console.log(id);
   if (this.destinations[id] != undefined) {
     return this.destinations[id];
   }
@@ -67,58 +69,79 @@ Destination.prototype.tripSummary = function () {
     "!"
   );
 };
-function attachDestinationListeners(dest) {
-  $("#display").on("click", "button", function(e) {
-    e.preventDefault();
-    // console.log ("The id of this <div> is " + this.id + ".");
-    // const displayText = dest[this.id].tripSummary();
-    const displayText = dest[this.id].note;
-    console.log("target: " + this.target);
-    console.log(dest[this.id]);
-    this.after($("<p>").text(displayText));
-  });
-}
+
+
 
 
 //ui logic
-$(document).ready(function () {
-  const myPassport = new Passport();
+const myPassport = new Passport();
 
+
+
+$(document).ready(function () {
   //selectors
   const form = $("form");
   const display = $("#display-text");
   const displayDiv = $("#display");
-  
-  attachDestinationListeners(myPassport.destinations);
+
+  attachDestinationListeners();
   //ui functions
 
-  function renderPassport() {
-    const passportKeys = Object.keys(myPassport.destinations);
-  
-    let destCardHtml = "";
-  
+  function renderPassport(passport) {
+    const passportKeys = Object.keys(passport.destinations);
+
+    let allCardsHtml = "";
+
     passportKeys.forEach((key) => {
-      const dest = myPassport.destinations[key];
-  
-      let landmarksHtml = "";
-  
-      dest.landmarks.forEach(landmark => {
-        landmarksHtml += "<li>" + landmark + "</li>"; 
-      });
-  
-      destCardHtml += "<div class='card mb-3'>" +
-        "<div class='card-header'>" + dest.location + "</div>" +
-        "<div class='card-body'>" +
-          "<h5 class='card-title'>A " + dest.season + " adventure</h5>" +
-          "<ul>" + landmarksHtml + "</ul>" +
-          "<button id =" + key + " class='btn btn-primary'>More</button>" +
-        "</div>" +
-      "</div>";
+      const dest = passport.destinations[key];
+      let destCardHtml =
+        "<div class='card mb-3'>" +
+        "<div class='card-header'><h2>" +
+        dest.location +
+        "</h2> <button id =" +
+        key +
+        " class='btn btn-primary show-button'>More</button></div>" +
+        "</div>";
+
+      allCardsHtml += destCardHtml;
     });
-    // displayDiv.empty();
-    displayDiv.append(destCardHtml);
+    displayDiv.empty();
+    displayDiv.append(allCardsHtml);
   }
 
+  function attachDestinationListeners() {
+    $("#display").on("click", ".show-button", function () {
+      showDestination(this.id);
+    });
+    $("#display").on("click", ".delete-button", function () {
+      myPassport.deleteDestination(this.id);
+      console.log(myPassport);
+      renderPassport(myPassport);
+    });
+  }
+  
+  function showDestination(id) {
+    const destination = myPassport.findDestination(id);
+  
+    let landmarksHtml = "";
+  
+    destination.landmarks.forEach((landmark) => {
+      landmarksHtml += "<li>" + landmark + "</li>";
+    });
+  
+    const detailsHtml = "<div class='card-body'>" +
+          "<h5 class='card-title'>A " +
+          destination.season +
+          " adventure</h5>" +
+          "<ul>" +
+          landmarksHtml +
+          "</ul>" +
+          "<p>It was " + destination.note +
+          "<button id=" + id + " class='btn btn-danger delete-button'>Delete</button> "
+          "</div>"
+  
+    $("#" + id).parent().after(detailsHtml);
+  }
   //handler callbacks
   const submitDestination = function (event) {
     event.preventDefault();
@@ -138,7 +161,7 @@ $(document).ready(function () {
 
     myPassport.addDestination(newDestination);
     console.dir(myPassport);
-    renderPassport();
+    renderPassport(myPassport);
   };
 
   //actions
