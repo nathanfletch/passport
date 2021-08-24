@@ -69,12 +69,24 @@ Destination.prototype.tripSummary = function() {
 
 //ui logic
 $(document).ready(function () {
-  const fakeDatabase = new Passport();
+  const myPassport = new Passport();
 
   //selectors
   const form = $("form");
   const display = $("#display-text");
 
+  //ui functions
+
+  // function renderPassport() {
+
+  //   const passportKeys = Object.keys(myPassport.destinations);
+  //   console.dir(passportKeys);
+  //   passportKeys.forEach(key => {
+  //     // display.append("<h3>").text(key.location);
+  //     console.dir(key);
+      
+  //   })    
+  // }
   //handler callbacks
   const submitDestination = function (event) {
     event.preventDefault();
@@ -86,10 +98,9 @@ $(document).ready(function () {
     const newDestination = new Destination(locationInput, seasonInput, noteInput, landmarksInput);
     display.text(newDestination.tripSummary());
 
-    fakeDatabase.addDestination(newDestination);
-    console.dir(fakeDatabase);
-
-    
+    myPassport.addDestination(newDestination);
+    console.dir(myPassport); 
+    renderPassport();   
   }
 
   //actions
